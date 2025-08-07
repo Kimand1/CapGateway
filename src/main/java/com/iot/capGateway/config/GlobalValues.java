@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-public class DbInformation {
-    private String server;
-    private int port;
-    private String dbId;
-    private String dbPw;
+public class GlobalValues {
+    private String locationCode;
+    private int locationLevel;
 }

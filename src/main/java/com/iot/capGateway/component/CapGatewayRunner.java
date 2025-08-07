@@ -3,7 +3,9 @@ package com.iot.capGateway.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.capGateway.config.Config;
 import com.iot.capGateway.config.DbInformation;
+import com.iot.capGateway.config.GlobalValues;
 import com.iot.capGateway.config.LogProvider;
+import com.iot.capGateway.service.GatewayManager;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,14 @@ import java.util.concurrent.CountDownLatch;
 
 @Component
 public class CapGatewayRunner implements CommandLineRunner {
+    private final DbInformation dbInformation;
+    private GlobalValues globalValues;
+
+    public CapGatewayRunner(DbInformation dbInformation) {
+        this.dbInformation = dbInformation;
+        this.globalValues = globalValues;
+    }
+
     @Override
     public void run(String... args) {
         if (args.length != 4) {
@@ -25,8 +35,8 @@ public class CapGatewayRunner implements CommandLineRunner {
 
         String nagIp = args[0];
         int nagPort = Integer.parseInt(args[1]);
-        DbInformation.setServer(args[2]);
-        DbInformation.setPort(Integer.parseInt(args[3]));
+        dbInformation.setServer(args[2]);
+        dbInformation.setPort(Integer.parseInt(args[3]));
 
         // AppConfig.json 읽기
         Path configPath = Paths.get("AppConfig.json");
@@ -51,10 +61,10 @@ public class CapGatewayRunner implements CommandLineRunner {
                 return;
             }
 
-            GlobalValues.setLocationCode(config.getLocationCode());
-            GlobalValues.setLocationLevel(config.getLocationLevel());
-            DbInformation.setDbId(config.getLAGDbId());
-            DbInformation.setDbPw(config.getLAGDbPw());
+            globalValues.setLocationCode(config.getLocationCode());
+            globalValues.setLocationLevel(Integer.parseInt(config.getLocationLevel()));
+            dbInformation.setDbId(config.getLAGDbId());
+            dbInformation.setDbPw(config.getLAGDbPw());
 
             // 게이트웨이 실행
             GatewayManager gatewayManager = new GatewayManager(nagIp, nagPort, config.getNAGAuthId(), config.getNAGAuthPw());
