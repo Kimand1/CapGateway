@@ -1,5 +1,6 @@
 package com.iot.capGateway.model;
 
+import com.iot.capGateway.util.XmlUtil;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlRootElement;
