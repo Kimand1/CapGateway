@@ -14,13 +14,14 @@ public class DbService {
     private final DisasterMessageRepo repo;
 
     @Transactional
-    public void saveCapData(CapData cap) {
-        String id = (cap.getIdentifier()==null || cap.getIdentifier().isBlank())
-                ? UUID.randomUUID().toString() : cap.getIdentifier();
-        var dm = repo.findByIdentifier(id).orElseGet(DisasterMessage::new);
-        dm.setIdentifier(id);
-        dm.setResultCode(cap.getResultCode());
-        dm.setCapXml(cap.toXml());  // CapData에 toXml 있으면 사용
+    public void saveCapDataRaw(String identifier, String rawXml) {
+        if (identifier != null && repo.findByIdentifier(identifier).isPresent()) {
+            return; // 중복 저장 방지
+        }
+        DisasterMessage dm = new DisasterMessage();
+        dm.setIdentifier(identifier != null ? identifier : "UNKNOWN");
+        dm.setCapXml(rawXml);
+        dm.setResultCode("200");
         repo.save(dm);
     }
 }

@@ -5,7 +5,7 @@
   "serverPw": "safeportal_pw",
   "NAGAuthId": "NAG_GATEWAY_001",
   "NAGAuthPw": "NAG_SECRET_1234",
-  "nagIp": "192.168.10.50",
+  "nagIp": "127.0.0.1",
   "nagPort": 25001,
   "localIp": "192.168.10.101",
   "reconnectIntervalSec": 30,

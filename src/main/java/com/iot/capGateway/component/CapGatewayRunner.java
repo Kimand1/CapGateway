@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!test")
-@ConditionalOnProperty(name = "gateway.enabled", havingValue = "true", matchIfMissing = true)
+//@Profile("!test")
+//@ConditionalOnProperty(name = "gateway.enabled", havingValue = "true", matchIfMissing = true)
 public class CapGatewayRunner implements CommandLineRunner {
 
     private final GatewayManager gatewayManager;
@@ -21,6 +21,7 @@ public class CapGatewayRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        log.info("[Runner] CapGatewayRunner started.");
         String nagIp = config.getNagIp();
         Integer nagPort = config.getNagPort();
         String nagId = config.getNAGAuthId();

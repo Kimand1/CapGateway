@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 @XmlType(propOrder = {
         "language","category","event","urgency","severity","certainty",
         "eventCode","senderName","headline","description","instruction",
-        "parameter","area"
+        "parameter","area","geocode"
 })
 public class CapInfoBlock {
 

@@ -14,6 +14,9 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class SocketClient {
@@ -24,9 +27,16 @@ public class SocketClient {
 
     private final ExecutorService reader = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "socket-reader");
-        t.setDaemon(true);
+        //t.setDaemon(true);
         return t;
     });
+    private final ScheduledExecutorService reconnector = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "socket-reconnector");
+        return t;
+    });
+
+    private volatile String lastIp;
+    private volatile int lastPort;
 
     private volatile boolean running = false;
 
@@ -46,6 +56,8 @@ public class SocketClient {
             this.socket.setSoTimeout(READ_TIMEOUT_MS);
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            this.lastIp = ip;
+            this.lastPort = port;
             this.running = true;
             return true;
         } catch (IOException e) {
@@ -96,6 +108,15 @@ public class SocketClient {
                 // 연결 종료/오류 → finally에서 정리
             } finally {
                 closeQuietly();
+                // 마지막 주소가 있으면 재접속 예약
+                if (lastIp != null && lastPort > 0) {
+                    reconnector.schedule(() -> {
+                        if (connect(lastIp, lastPort)) {
+                            // 성공 시 수신 재개
+                            if (listener != null) receive();
+                        }
+                    }, 15, TimeUnit.SECONDS); // 15초 후 재시도 (원하면 설정값으로)
+                }
             }
         });
     }

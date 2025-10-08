@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "info", propOrder = {
+        "alert",
         "language", "category", "event", "responseType",
         "urgency", "severity", "certainty",
         "audience", "eventCode", "effective",

@@ -88,16 +88,20 @@ public class GatewayManager {
     /** CAP 수신 처리 & 확인응답 */
     private void handleCap(String xml) {
         log.info("[RX] ETS_NFY_DIS_INFO CAP XML {}B", xml == null ? 0 : xml.length());
+
+        // 파싱은 identifier 추출 등 최소한으로만 사용
         CapData cap = CapData.fromXml(xml);
+        String identifier = cap.getAlert() != null ? cap.getAlert().getIdentifier() : null;
 
-        // 유효성/필터링(선택) → DB 저장
-        dbService.saveCapData(cap);
+        // ✅ DB에는 '원문 xml'을 저장
+        dbService.saveCapDataRaw(identifier, xml);
 
-        // 확인응답: ETS_CNF_DIS_INFO (원본 CAP 되돌려보내는 계약일 경우)
+        // ✅ 확인응답은 '원문 xml'을 그대로 에코(계약이 원문 에코라면)
         try {
-            String ackXml = XmlUtil.toXml(cap);
-            socketClient.send(new SocketMessage(MessageId.ETS_CNF_DIS_INFO, DataFormat.XML, ackXml));
-            log.info("[TX] ETS_CNF_DIS_INFO (확인응답)");
+            socketClient.send(new SocketMessage(
+                    MessageId.ETS_CNF_DIS_INFO, DataFormat.XML, xml   // ← 여기!
+            ));
+            log.info("[TX] ETS_CNF_DIS_INFO (원문 에코)");
         } catch (Exception e) {
             log.error("확인응답 송신 실패", e);
         }

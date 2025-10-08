@@ -1,5 +1,6 @@
 package com.iot.capGateway.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -25,9 +26,10 @@ public class AppConfiguration {
     private String serverPw;
     private String NAGAuthId;
     private String NAGAuthPw;
-    private String nagIp;           // ✅ 추가
-    private Integer nagPort;        // ✅ 추가
-    private Integer reconnectIntervalSec; // 선택
+    private String nagIp;
+    private Integer nagPort;
+    private Integer reconnectIntervalSec;
+    private String localIp;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -51,6 +53,7 @@ public class AppConfiguration {
                 this.nagIp     = first(this.nagIp, local.nagIp);
                 this.nagPort   = first(this.nagPort, local.nagPort);
                 this.reconnectIntervalSec = first(this.reconnectIntervalSec, local.reconnectIntervalSec);
+                this.localIp   = first(this.localIp, local.localIp);
                 log.info("AppConfiguration loaded from {}", p.toAbsolutePath());
             } else {
                 log.warn("AppConfig.json not found. Using env/system properties if provided.");
@@ -95,6 +98,7 @@ public class AppConfiguration {
 
     /** AppConfig.json 매핑용 DTO */
     @Getter @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class LocalConfig {
         public String dbId;
         public String dbPw;
@@ -105,5 +109,6 @@ public class AppConfiguration {
         public String nagIp;
         public Integer nagPort;
         public Integer reconnectIntervalSec;
+        public String localIp;
     }
 }
