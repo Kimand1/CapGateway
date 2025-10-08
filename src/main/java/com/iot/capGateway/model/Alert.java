@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 // ✅ 추가
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 })
 public class Alert {
     public static final String CAP_NS = "urn:oasis:names:tc:emergency:cap:1.2";
+    private static final Set<String> GEO_VALUE_NAMES = Set.of("LOCATION_CODE","KR.locationCode","KR.geoCode");
+
 
     @XmlElement(namespace = CAP_NS) private String identifier;
     @XmlElement(namespace = CAP_NS) private String sender;
