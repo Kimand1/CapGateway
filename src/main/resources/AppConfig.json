@@ -1,0 +1,16 @@
+{
+  "dbId": "cap_user",
+  "dbPw": "kiot0026!",
+  "serverId": "safeportal01",
+  "serverPw": "safeportal_pw",
+  "NAGAuthId": "NAG_GATEWAY_001",
+  "NAGAuthPw": "NAG_SECRET_1234",
+  "nagIp": "192.168.10.50",
+  "nagPort": 25001,
+  "localIp": "192.168.10.101",
+  "reconnectIntervalSec": 30,
+  "logging": {
+    "level": "INFO",
+    "file": "logs/capGateway.log"
+  }
+}

@@ -5,28 +5,33 @@ import com.iot.capGateway.service.GatewayManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
+@ConditionalOnProperty(name = "gateway.enabled", havingValue = "true", matchIfMissing = true)
 public class CapGatewayRunner implements CommandLineRunner {
 
-    private final GatewayManager gatewayManager;     // ✅ 스프링 빈 주입
-    private final AppConfiguration appConfiguration; // AppConfig.json 파싱 결과(이미 기존 코드에 있음)
+    private final GatewayManager gatewayManager;
+    private final AppConfiguration config;
 
     @Override
     public void run(String... args) {
-        // 실행 인자: <NAG_IP> <NAG_PORT> <DB_IP> <DB_PORT> ... 식으로 들어오는 기존 방식을 유지하되,
-        // NAG 인증 계정은 AppConfig.json에서 읽어온 값을 우선 사용
-        String nagIp   = args.length > 0 ? args[0] : "127.0.0.1";
-        int nagPort    = args.length > 1 ? Integer.parseInt(args[1]) : 9404;
+        String nagIp = config.getNagIp();
+        Integer nagPort = config.getNagPort();
+        String nagId = config.getNAGAuthId();
+        String nagPw = config.getNAGAuthPw();
 
-        // AppConfig.json 내 계정 사용
-        String nagId   = appConfiguration.getNAGAuthId();
-        String nagPw   = appConfiguration.getNAGAuthPw();
+        if (nagIp == null || nagPort == null || nagId == null || nagPw == null) {
+            log.error("NAG 연결 정보가 부족합니다. (nagIp/nagPort/NAGAuthId/NAGAuthPw). AppConfig.json 또는 환경변수를 확인하세요.");
+            return;
+        }
 
-        log.info("Starting CAP Gateway with NAG {}:{} (id={})", nagIp, nagPort, nagId);
-        gatewayManager.run(nagIp, nagPort, nagId, nagPw);   // ✅ 단 한 줄로 진입
+        log.info("Starting CAP Gateway -> {}:{} (id={})", nagIp, nagPort, nagId);
+        gatewayManager.run(nagIp, nagPort, nagId, nagPw);
     }
 }
